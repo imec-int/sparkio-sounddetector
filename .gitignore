@@ -1,3 +1,5 @@
+## C
+
 # Object files
 *.o
 *.ko
@@ -21,3 +23,31 @@
 *.i*86
 *.x86_64
 *.hex
+
+
+## Node.js
+lib-cov
+*.log
+*.csv
+*.dat
+*.out
+*.pid
+*.gz
+
+pids
+logs
+results
+
+npm-debug.log
+node_modules
+
+*.css
+!**/vendor/**/*.css
+!**/dist/**/*.css
+
+## Other
+*.aac
+*.flac
+*.psd
+.DS_Store
+
