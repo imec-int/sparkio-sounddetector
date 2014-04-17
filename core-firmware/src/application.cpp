@@ -46,7 +46,7 @@ IPAddress httpServer(10,100,11,7);
 int httpPort = 3000;
 uint8_t *responseBuffer;
 
-const char *actionSound = "POST /rest/soundstate HTTP/1.1\r\nHost: somehost\r\nConnection: keep-alive\r\nContent-Type: application/x-www-form-urlencoded\r\nContent-Length: 12\r\n\r\naction=sound\r\n";     //171
+const char *actionSound   = "POST /rest/soundstate HTTP/1.1\r\nHost: somehost\r\nConnection: keep-alive\r\nContent-Type: application/x-www-form-urlencoded\r\nContent-Length: 12\r\n\r\naction=sound\r\n";   //171
 const char *actionNoSound = "POST /rest/soundstate HTTP/1.1\r\nHost: somehost\r\nConnection: keep-alive\r\nContent-Type: application/x-www-form-urlencoded\r\nContent-Length: 14\r\n\r\naction=nosound\r\n"; //173
 const char *actionStartup = "POST /rest/soundstate HTTP/1.1\r\nHost: somehost\r\nConnection: keep-alive\r\nContent-Type: application/x-www-form-urlencoded\r\nContent-Length: 14\r\n\r\naction=startup\r\n"; //173
 
@@ -95,7 +95,7 @@ void loop()
 		if(currentSoundValue > threshold){
 			thresholdCapacity++;
 
-			if(thresholdCapacity >= 20){
+			if(thresholdCapacity >= 3){
 				capacity = 200; //2 seconds
 				thresholdCapacity = 0;
 
@@ -108,6 +108,11 @@ void loop()
 				capacity = 0; //cap
 
 				updateState(0);
+			}
+
+			thresholdCapacity--;
+			if(thresholdCapacity <= 0){
+				thresholdCapacity = 0;
 			}
 		}
 	}
