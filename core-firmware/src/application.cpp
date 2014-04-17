@@ -50,6 +50,8 @@ const char *actionSound = "POST /rest/soundstate HTTP/1.1\r\nHost: somehost\r\nC
 const char *actionNoSound = "POST /rest/soundstate HTTP/1.1\r\nHost: somehost\r\nConnection: keep-alive\r\nContent-Type: application/x-www-form-urlencoded\r\nContent-Length: 14\r\n\r\naction=nosound\r\n"; //173
 const char *actionStartup = "POST /rest/soundstate HTTP/1.1\r\nHost: somehost\r\nConnection: keep-alive\r\nContent-Type: application/x-www-form-urlencoded\r\nContent-Length: 14\r\n\r\naction=startup\r\n"; //173
 
+bool debug = false;
+
 /* This function is called once at start up ----------------------------------*/
 void setup()
 {
@@ -132,19 +134,19 @@ void updateState(int state) {
 }
 
 void sendStateOverTcp(int state) {
-	Serial.println("Sending state over TCP");
+	if(debug) Serial.println("Sending state over TCP");
 
 	if( !tcpclient.connected() ){
-		Serial.println("TCP was not connected. Connecting...");
+		if(debug) Serial.println("TCP was not connected. Connecting...");
 		tcpclient.connect(tcpServer, tcpPort);
 	}
 
 	if( !tcpclient.connected() ){
-		Serial.println("TCP could not connect.");
+		if(debug) Serial.println("TCP could not connect.");
 		return;
 	}
 
-	Serial.println("TCP connected. Sending state.");
+	if(debug) Serial.println("TCP connected. Sending state.");
 
 	if(state == 1){
 		tcpclient.print("sound");
@@ -158,24 +160,24 @@ void sendStateOverTcp(int state) {
 
 	tcpclient.flush();
 
-	Serial.println("TCP flushed.");
+	if(debug) Serial.println("TCP flushed.");
 }
 
 void postState(int state) {
-	Serial.println("Sending state over HTTP POST");
+	if(debug) Serial.println("Sending state over HTTP POST");
 
 
 	if( !httpclient.connected() ){
-		Serial.println("HTTP was not connected. Connecting...");
+		if(debug) Serial.println("HTTP was not connected. Connecting...");
 		httpclient.connect(httpServer, httpPort);
 	}
 
 	if( !httpclient.connected() ){
-		Serial.println("HTTP could not connect.");
+		if(debug) Serial.println("HTTP could not connect.");
 		return;
 	}
 
-	Serial.println("HTTP connected. Sending state.");
+	if(debug) Serial.println("HTTP connected. Sending state.");
 
 	// httpclient.print(postHeader);
 
@@ -193,14 +195,14 @@ void postState(int state) {
 
 	// flush, so the buffer is clear to read response:
 	httpclient.flush();
-	Serial.println("HTTP flushed.");
+	if(debug) Serial.println("HTTP flushed.");
 
 
 	// READ RESPONSE
 	httpclient.read(responseBuffer, 2048);
 
-	Serial.println((char*)responseBuffer);
-	Serial.println();
+	if(debug) Serial.println((char*)responseBuffer);
+	if(debug) Serial.println();
 
 
 	// httpclient.stop(); //break connection (not necessary, server will break connection depending on 'Connection' header)
