@@ -33,11 +33,13 @@ var App = function (options){
 		console.log(action);
 
 		if(action == 'sound'){
-			$('.sound').show();
+			$('.sound.on').show();
+			$('.sound.off').hide();
 		}
 
 		if(action == 'nosound'){
-			$('.sound').hide();
+			$('.sound.off').show();
+			$('.sound.on').hide();
 		}
 
 		if(action == 'startup'){
