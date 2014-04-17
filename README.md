@@ -29,3 +29,9 @@ If the LED is flashing reddish green, flash the Spark with
 To debug stuff like Arduino's and this Spark, use a serial connection. Download [CoolTerm](http://freeware.the-meiers.org/), wait for the Spark to boot up and connect to it.
 
 Don't forget to go to __options__ to select the right serial port first.
+
+## Turning off the Spark Cloud
+
+If you want to turn off the Spark Cloud, change this line of ```core-firmware/src/main.cpp``` to
+
+    SPARK_CLOUD_CONNECT = 0;
