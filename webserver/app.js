@@ -41,6 +41,14 @@ app.get('/', function (req, res){
 
 // http post:
 app.post('/rest/soundstate', function (req, res){
+	// http://stackoverflow.com/questions/8107856/how-can-i-get-the-users-ip-address-using-node-js
+	var ip = req.headers['x-forwarded-for'] ||
+		req.connection.remoteAddress ||
+		req.socket.remoteAddress ||
+		req.connection.socket.remoteAddress;
+
+	console.log('ip: ', ip);
+
 	console.log(req.body);
 
 	if(req.body.action)

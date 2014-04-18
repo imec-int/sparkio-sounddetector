@@ -37,20 +37,26 @@ int currentSoundState = 0;
 
 // TCP:
 TCPClient tcpclient;
+// IPAddress tcpServer(10,100,11,137);
 IPAddress tcpServer(10,100,11,7);
 int tcpPort = 8000;
 
 // HTTP:
 TCPClient httpclient;
+// IPAddress httpServer(10,100,11,137);
 IPAddress httpServer(10,100,11,7);
 int httpPort = 3000;
+
 uint8_t *responseBuffer;
 
 const char *actionSound   = "POST /rest/soundstate HTTP/1.1\r\nHost: somehost\r\nConnection: keep-alive\r\nContent-Type: application/x-www-form-urlencoded\r\nContent-Length: 12\r\n\r\naction=sound\r\n";   //171
 const char *actionNoSound = "POST /rest/soundstate HTTP/1.1\r\nHost: somehost\r\nConnection: keep-alive\r\nContent-Type: application/x-www-form-urlencoded\r\nContent-Length: 14\r\n\r\naction=nosound\r\n"; //173
 const char *actionStartup = "POST /rest/soundstate HTTP/1.1\r\nHost: somehost\r\nConnection: keep-alive\r\nContent-Type: application/x-www-form-urlencoded\r\nContent-Length: 14\r\n\r\naction=startup\r\n"; //173
 
-bool debug = false;
+// HTTP Server
+TCPServer server(80);
+const char *rootPage = "HTTP/1.1 200 OK\r\nServer: samserver/0.0.1\r\nContent-Type: text/html\r\nContent-Length: 259\r\nConnection: close\r\n\r\n<html><head><link rel=\"stylesheet\" type=\"text/css\" href=\"//netdna.bootstrapcdn.com/bootstrap/3.1.1/css/bootstrap.min.css\"><script src=\"//ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js\"></script></head><body><h1>MiX Sound Detector</h1></body></html>";
+bool debug = true;
 
 /* This function is called once at start up ----------------------------------*/
 void setup()
@@ -66,11 +72,40 @@ void setup()
 	updateState(-1);
 
 	digitalWrite(ledPin2, 1);
+
+
+	server.begin();
 }
 
 /* This function loops forever (every 5ms) ------------------------------------*/
 void loop()
 {
+	// HTTP Server:
+	TCPClient client = server.available();
+	while (client.connected()) {
+		if(debug) Serial.println("Server: client connected");
+		if (client.available()) {
+			uint8_t buffer[1024] = {0};
+
+			// uint8_t *buffer = new uint8_t[1024];
+			client.read(buffer, 1024);
+
+			if(debug) Serial.println((char*)buffer);
+
+			if (strncmp((char*)buffer, "GET / HTTP/", 11) == 0) {
+				if(debug) Serial.println("receiving http / request... responding with rootPage");
+
+				client.print(rootPage);
+				client.flush();
+				// give the client time to receive the data
+				delay(10);
+			}
+		}
+		// close the connection:
+		if(debug) Serial.println("Server: closing connection");
+		client.stop();
+	}
+
 	// SIMULATE SOUND USING BUTTON:
 	buttonState = digitalRead(buttonPin);
 
