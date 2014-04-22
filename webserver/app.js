@@ -46,7 +46,7 @@ app.post('/rest/soundstate', function (req, res){
 	if(req.body.action)
 		io.sockets.emit('action', req.body.action);
 
-	res.send(200);
+	res.send('received: ' + req.body.action + "\n\n");
 });
 
 
