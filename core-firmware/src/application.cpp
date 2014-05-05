@@ -36,12 +36,12 @@ int currentSoundState = 0;
 
 // TCP:
 TCPClient tcpclient;
-IPAddress tcpServer(10,100,11,7);
+IPAddress tcpServer(10,100,11,60);
 int tcpPort = 8000;
 
 // HTTP:
 TCPClient httpclient;
-IPAddress httpServer(10,100,11,7);
+IPAddress httpServer(10,100,11,60);
 int httpPort = 3000;
 uint8_t *responseBuffer;
 
