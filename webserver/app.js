@@ -12,7 +12,7 @@ var net = require('net');
 var app = express();
 
 app.configure(function(){
-	app.set('port', process.env.PORT || 3000);
+	app.set('port', process.env.PORT || 8090);
 	app.set('views', __dirname + '/views');
 	app.set('view engine', 'jade');
 	app.use(express.favicon());
@@ -40,8 +40,7 @@ app.get('/', function (req, res){
 
 
 // http put:
-app.put('/rest/soundstate', function (req, res){
-	console.log(req.body);
+app.put('/message/user/:user', function (req, res){
 
 	if(req.body.action)
 		io.sockets.emit('action', req.body.action);

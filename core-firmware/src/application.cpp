@@ -41,13 +41,14 @@ int tcpPort = 8000;
 
 // HTTP:
 TCPClient httpclient;
-IPAddress httpServer(10,100,11,60);
-int httpPort = 3000;
+// IPAddress httpServer(10,100,11,60); // Sam
+IPAddress httpServer(10,100,11,216); // Dorthe
+int httpPort = 8090;
 uint8_t *responseBuffer;
 
-const char *actionSound   = "PUT /rest/soundstate HTTP/1.1\r\nHost: somehost\r\nConnection: keep-alive\r\nContent-Type: application/x-www-form-urlencoded\r\nContent-Length: 7\r\n\r\nmic0=on\r\n";
-const char *actionNoSound = "PUT /rest/soundstate HTTP/1.1\r\nHost: somehost\r\nConnection: keep-alive\r\nContent-Type: application/x-www-form-urlencoded\r\nContent-Length: 8\r\n\r\nmic0=off\r\n";
-const char *actionStartup = "PUT /rest/soundstate HTTP/1.1\r\nHost: somehost\r\nConnection: keep-alive\r\nContent-Type: application/x-www-form-urlencoded\r\nContent-Length: 16\r\n\r\nsounddetector=on\r\n";
+const char *actionSound   = "PUT /message/putit HTTP/1.1\r\nHost: somehost\r\nConnection: keep-alive\r\nContent-Type: application/json\r\nContent-Length: 69\r\n\r\n{\"microphones\":[{\"name\":\"Sam's mic\",\"value\": \"sound\",\"id\" : \"mic1\"}]}\r\n";
+const char *actionNoSound = "PUT /message/putit HTTP/1.1\r\nHost: somehost\r\nConnection: keep-alive\r\nContent-Type: application/json\r\nContent-Length: 71\r\n\r\n{\"microphones\":[{\"name\":\"Sam's mic\",\"value\": \"silence\",\"id\" : \"mic1\"}]}\r\n";
+const char *actionStartup = "PUT /message/putit HTTP/1.1\r\nHost: somehost\r\nConnection: keep-alive\r\nContent-Type: application/json\r\nContent-Length: 37\r\n\r\n{\"sounddetector\":{\"state\":\"booting\"}}\r\n";
 
 bool debug = false;
 
