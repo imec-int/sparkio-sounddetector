@@ -45,9 +45,9 @@ IPAddress httpServer(10,100,11,60);
 int httpPort = 3000;
 uint8_t *responseBuffer;
 
-const char *actionSound   = "POST /rest/soundstate HTTP/1.1\r\nHost: somehost\r\nConnection: keep-alive\r\nContent-Type: application/x-www-form-urlencoded\r\nContent-Length: 12\r\n\r\naction=sound\r\n";
-const char *actionNoSound = "POST /rest/soundstate HTTP/1.1\r\nHost: somehost\r\nConnection: keep-alive\r\nContent-Type: application/x-www-form-urlencoded\r\nContent-Length: 14\r\n\r\naction=nosound\r\n";
-const char *actionStartup = "POST /rest/soundstate HTTP/1.1\r\nHost: somehost\r\nConnection: keep-alive\r\nContent-Type: application/x-www-form-urlencoded\r\nContent-Length: 14\r\n\r\naction=startup\r\n";
+const char *actionSound   = "PUT /rest/soundstate HTTP/1.1\r\nHost: somehost\r\nConnection: keep-alive\r\nContent-Type: application/x-www-form-urlencoded\r\nContent-Length: 7\r\n\r\nmic0=on\r\n";
+const char *actionNoSound = "PUT /rest/soundstate HTTP/1.1\r\nHost: somehost\r\nConnection: keep-alive\r\nContent-Type: application/x-www-form-urlencoded\r\nContent-Length: 8\r\n\r\nmic0=off\r\n";
+const char *actionStartup = "PUT /rest/soundstate HTTP/1.1\r\nHost: somehost\r\nConnection: keep-alive\r\nContent-Type: application/x-www-form-urlencoded\r\nContent-Length: 16\r\n\r\nsounddetector=on\r\n";
 
 bool debug = false;
 
@@ -182,15 +182,15 @@ void sendStateOverTcp(int state)
 
 	if(state == 1)
 	{
-		tcpclient.print("sound");
+		tcpclient.print("mic0=on");
 	}
 	if(state == 0)
 	{
-		tcpclient.print("nosound");
+		tcpclient.print("mic0=off");
 	}
 	if(state == -1)
 	{
-		tcpclient.print("startup");
+		tcpclient.print("sounddetector=on");
 	}
 
 	tcpclient.flush();

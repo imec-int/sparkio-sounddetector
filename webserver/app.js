@@ -39,8 +39,8 @@ app.get('/', function (req, res){
 });
 
 
-// http post:
-app.post('/rest/soundstate', function (req, res){
+// http put:
+app.put('/rest/soundstate', function (req, res){
 	console.log(req.body);
 
 	if(req.body.action)
