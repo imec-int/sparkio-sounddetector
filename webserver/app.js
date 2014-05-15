@@ -40,12 +40,14 @@ app.get('/', function (req, res){
 
 
 // http put:
-app.put('/message/user/:user', function (req, res){
+app.put('/message/putit', function (req, res){
 
-	if(req.body.action)
-		io.sockets.emit('action', req.body.action);
+	console.log(req.body);
 
-	res.send('received: ' + req.body.action + "\n\n");
+	// if(req.body.action)
+	// 	io.sockets.emit('action', req.body.action);
+
+	res.send('received: ' + req.body + "\n\n");
 });
 
 

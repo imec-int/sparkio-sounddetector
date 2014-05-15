@@ -46,9 +46,9 @@ IPAddress httpServer(10,100,11,216); // Dorthe
 int httpPort = 8090;
 uint8_t *responseBuffer;
 
-const char *actionSound   = "PUT /message/putit HTTP/1.1\r\nHost: somehost\r\nConnection: keep-alive\r\nContent-Type: application/json\r\nContent-Length: 69\r\n\r\n{\"microphones\":[{\"name\":\"Sam's mic\",\"value\": \"sound\",\"id\" : \"mic1\"}]}\r\n";
-const char *actionNoSound = "PUT /message/putit HTTP/1.1\r\nHost: somehost\r\nConnection: keep-alive\r\nContent-Type: application/json\r\nContent-Length: 71\r\n\r\n{\"microphones\":[{\"name\":\"Sam's mic\",\"value\": \"silence\",\"id\" : \"mic1\"}]}\r\n";
-const char *actionStartup = "PUT /message/putit HTTP/1.1\r\nHost: somehost\r\nConnection: keep-alive\r\nContent-Type: application/json\r\nContent-Length: 37\r\n\r\n{\"sounddetector\":{\"state\":\"booting\"}}\r\n";
+const char *actionSound   = "PUT /message/putit HTTP/1.1\r\nHost: somehost\r\nConnection: keep-alive\r\nContent-Type: application/json\r\nContent-Length: 75\r\n\r\n{\n\t\"MicStateChangedInRunningMeeting\": {\n\t\t\"SeatNr\": 0,\n\t\t\"State\": \"On\"\n\t}\n}";
+const char *actionNoSound = "PUT /message/putit HTTP/1.1\r\nHost: somehost\r\nConnection: keep-alive\r\nContent-Type: application/json\r\nContent-Length: 76\r\n\r\n{\n\t\"MicStateChangedInRunningMeeting\": {\n\t\t\"SeatNr\": 0,\n\t\t\"State\": \"Off\"\n\t}\n}";
+const char *actionStartup = "PUT /message/putit HTTP/1.1\r\nHost: somehost\r\nConnection: keep-alive\r\nContent-Type: application/json\r\nContent-Length: 37\r\n\r\n{\"sounddetector\":{\"state\":\"booting\"}}";
 
 bool debug = false;
 
