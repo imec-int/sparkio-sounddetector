@@ -12,15 +12,11 @@
 
 /* Function prototypes -------------------------------------------------------*/
 void updateState(int state);
-void sendStateOverTcp(int state);
 void postState(int state);
 void readIncommingHttpData();
 
 
 /* Variables -----------------------------------------------------------------*/
-bool useTCP = false;
-bool useHTTP = true;
-
 int ledPin = D0;
 int ledPin2 = D1;
 int soundPin = A0;
@@ -33,11 +29,6 @@ int threshold = 2200; //in mV
 int capacity = 0;
 int thresholdCapacity = 0;
 int currentSoundState = 0;
-
-// TCP:
-TCPClient tcpclient;
-IPAddress tcpServer(10,100,11,60);
-int tcpPort = 8000;
 
 // HTTP:
 TCPClient httpclient;
@@ -124,11 +115,8 @@ void loop()
 		}
 	}
 
-	if( useHTTP )
-	{
-		readIncommingHttpData();
-	}
 
+	readIncommingHttpData();
 
 	delay(5); // wait an extra 5ms, that's 10ms between loops
 
@@ -145,59 +133,10 @@ void updateState(int state)
 	{
 		currentSoundState = state;
 
-		if( useTCP == true)
-		{
-			sendStateOverTcp(state);
-		}
-
-		if( useHTTP == true )
-		{
-			postState(state);
-		}
+		postState(state);
 	}
 }
 
-void sendStateOverTcp(int state)
-{
-	if(debug) Serial.println("Sending state over TCP");
-
-	if( !tcpclient.connected() )
-	{
-		if(debug) Serial.println("TCP was not connected. Connecting...");
-		tcpclient.connect(tcpServer, tcpPort);
-	}
-
-	if( !tcpclient.connected() )
-	{
-		if(debug) Serial.println("TCP still not connected. Trying a second time...");
-		tcpclient.connect(tcpServer, tcpPort);
-	}
-
-	if( !tcpclient.connected() )
-	{
-		if(debug) Serial.println("TCP could not connect.");
-		return;
-	}
-
-	if(debug) Serial.println("TCP connected. Sending state.");
-
-	if(state == 1)
-	{
-		tcpclient.print("mic0=on");
-	}
-	if(state == 0)
-	{
-		tcpclient.print("mic0=off");
-	}
-	if(state == -1)
-	{
-		tcpclient.print("sounddetector=on");
-	}
-
-	tcpclient.flush();
-
-	if(debug) Serial.println("TCP flushed.");
-}
 
 void postState(int state) {
 	if(debug) Serial.println("Sending state over HTTP POST");
