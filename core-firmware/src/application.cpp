@@ -41,8 +41,8 @@ int tcpPort = 8000;
 
 // HTTP:
 TCPClient httpclient;
-// IPAddress httpServer(10,100,11,60); // Sam
-IPAddress httpServer(10,100,11,216); // Dorthe
+IPAddress httpServer(10,100,11,7); // Sam
+// IPAddress httpServer(10,100,11,216); // Dorthe
 int httpPort = 8090;
 uint8_t *responseBuffer;
 
