@@ -17,8 +17,8 @@ void readIncommingHttpData();
 
 
 /* Variables -----------------------------------------------------------------*/
-int ledPin = D0;
-int ledPin2 = D1;
+const int ledPin = D0;
+const int ledPin2 = D1;
 const int soundPins[] = {A0, A1, A2, A3, A4, A5, A6, A7};
 
 static const int pinCount = 8;
@@ -46,6 +46,7 @@ bool debug = true;
 void setup()
 {
 	pinMode(ledPin, OUTPUT);
+	pinMode(ledPin2, OUTPUT);
 
 	// register every pin as input:
 	for (int pin = 0; pin < pinCount; ++pin)
@@ -60,6 +61,7 @@ void setup()
 
 	if(debug) Serial.begin(9600);
 
+	// indicates machine is booting:
 	digitalWrite(ledPin2, 1);
 }
 
