@@ -11,50 +11,54 @@
 #include "application.h"
 
 /* Function prototypes -------------------------------------------------------*/
-void updateState(int state);
-void postState(int state);
+void updateState(int pin, int state);
+void postState(int pin, int state);
 void readIncommingHttpData();
 
 
 /* Variables -----------------------------------------------------------------*/
 int ledPin = D0;
 int ledPin2 = D1;
-int soundPin = A0;
-int currentSoundValue;
-int buttonPin = D2;
+const int soundPins[] = {A0, A1, A2, A3, A4, A5, A6, A7};
 
-bool buttonState = 0;
-bool buttonPressed = false;
+static const int pinCount = 8;
+int soundValues[pinCount] = {0};
+
 int threshold = 2200; //in mV
-int capacity = 0;
-int thresholdCapacity = 0;
-int currentSoundState = 0;
+int capacity[pinCount] = {0};
+int thresholdCapacity[pinCount] = {0};
+int currentSoundState[pinCount] = {0};
 
 // HTTP:
 TCPClient httpclient;
 IPAddress httpServer(10,100,11,7); // Sam
 // IPAddress httpServer(10,100,11,216); // Dorthe
 int httpPort = 8090;
-uint8_t *responseBuffer;
 
-const char *actionSound   = "PUT /message/putit HTTP/1.1\r\nHost: somehost\r\nConnection: keep-alive\r\nContent-Type: application/json\r\nContent-Length: 75\r\n\r\n{\n\t\"MicStateChangedInRunningMeeting\": {\n\t\t\"SeatNr\": 0,\n\t\t\"State\": \"On\"\n\t}\n}";
-const char *actionNoSound = "PUT /message/putit HTTP/1.1\r\nHost: somehost\r\nConnection: keep-alive\r\nContent-Type: application/json\r\nContent-Length: 76\r\n\r\n{\n\t\"MicStateChangedInRunningMeeting\": {\n\t\t\"SeatNr\": 0,\n\t\t\"State\": \"Off\"\n\t}\n}";
-const char *actionStartup = "PUT /message/putit HTTP/1.1\r\nHost: somehost\r\nConnection: keep-alive\r\nContent-Type: application/json\r\nContent-Length: 37\r\n\r\n{\"sounddetector\":{\"state\":\"booting\"}}";
+uint8_t responseBuffer[1024];
 
-bool debug = false;
+char actionSound[pinCount][230];
+char actionNoSound[pinCount][231];
+
+bool debug = true;
 
 /* This function is called once at start up ----------------------------------*/
 void setup()
 {
 	pinMode(ledPin, OUTPUT);
-	pinMode(soundPin, INPUT);
-	pinMode(buttonPin, INPUT);
 
-	Serial.begin(9600);
+	// register every pin as input:
+	for (int pin = 0; pin < pinCount; ++pin)
+	{
+		pinMode(soundPins[pin], INPUT);
 
-	responseBuffer = new uint8_t[1024];
+		// create http post strings:
+		sprintf(actionSound[pin], "PUT /message/putit HTTP/1.1\r\nHost: somehost\r\nConnection: keep-alive\r\nContent-Type: application/json\r\nContent-Length: 75\r\n\r\n{\n\t\"MicStateChangedInRunningMeeting\": {\n\t\t\"SeatNr\": %d,\n\t\t\"State\": \"On\"\n\t}\n}", pin);
+		sprintf(actionNoSound[pin], "PUT /message/putit HTTP/1.1\r\nHost: somehost\r\nConnection: keep-alive\r\nContent-Type: application/json\r\nContent-Length: 76\r\n\r\n{\n\t\"MicStateChangedInRunningMeeting\": {\n\t\t\"SeatNr\": %d,\n\t\t\"State\": \"Off\"\n\t}\n}", pin);
+	}
 
-	updateState(-1);
+
+	if(debug) Serial.begin(9600);
 
 	digitalWrite(ledPin2, 1);
 }
@@ -62,84 +66,68 @@ void setup()
 /* This function loops forever (every 5ms) ------------------------------------*/
 void loop()
 {
-	// SIMULATE SOUND USING BUTTON:
-	buttonState = digitalRead(buttonPin);
-
-	if(buttonState == 1 && buttonPressed == false)
+	for (int pin = 0; pin < pinCount; ++pin)
 	{
-		buttonPressed = true;
+		soundValues[pin] = analogRead(soundPins[pin]);
 
-		updateState(1);
-	}
-
-	if(buttonPressed == true && buttonState == 0)
-	{
-		buttonPressed = false;
-
-		updateState(0);
-	}
-
-
-	// LISTEN FOR SOUND:
-	if(!buttonPressed) // dont interfere with the testbutton
-	{
-		currentSoundValue = analogRead(soundPin);
-
-		if(currentSoundValue > threshold)
+		if(soundValues[pin] > threshold)
 		{
-			thresholdCapacity++;
+			thresholdCapacity[pin]++;
 
-			if(thresholdCapacity >= 3)
+			if(thresholdCapacity[pin] >= 3)
 			{
-				capacity = 200; //2 seconds
-				thresholdCapacity = 0;
+				capacity[pin] = 200; //2 seconds
+				thresholdCapacity[pin] = 0;
 
-				updateState(1);
+				updateState(pin, 1);
 			}
 		}
 		else
 		{
-			capacity--;
-			if(capacity <= 0 ){
+			capacity[pin]--;
+			if(capacity[pin] <= 0 ){
 				// happens after capacity*(delay+5 ms):
-				capacity = 0; //cap
+				capacity[pin] = 0; //cap
 
-				updateState(0);
+				updateState(pin, 0);
 			}
 
-			thresholdCapacity--;
-			if(thresholdCapacity <= 0)
+			thresholdCapacity[pin]--;
+			if(thresholdCapacity[pin] <= 0)
 			{
-				thresholdCapacity = 0;
+				thresholdCapacity[pin] = 0;
 			}
 		}
 	}
 
-
-	readIncommingHttpData();
+	readIncommingHttpData(); // so that the socket doesn't block everything
 
 	delay(5); // wait an extra 5ms, that's 10ms between loops
 
-	// indicates machine has bootet:
+	// indicates machine has booted:
 	digitalWrite(ledPin2, 0);
 }
 
-void updateState(int state)
+void updateState(int pin, int state)
 {
-	digitalWrite(ledPin, state); // turn LED on/off
-
 	// only send state if different from previous:
-	if(currentSoundState != state)
+	if(currentSoundState[pin] != state)
 	{
-		currentSoundState = state;
+		currentSoundState[pin] = state;
 
-		postState(state);
+		digitalWrite(ledPin, state); // turn LED on/off
+
+		postState(pin, state);
 	}
 }
 
 
-void postState(int state) {
+void postState(int pin, int state) {
 	if(debug) Serial.println("Sending state over HTTP POST");
+	if(debug) Serial.print("Pin: ");
+	if(debug) Serial.print(pin);
+	if(debug) Serial.print("State: ");
+	if(debug) Serial.println(state);
 
 
 	if( !httpclient.connected() )
@@ -165,18 +153,14 @@ void postState(int state) {
 
 	if(state == 1)
 	{
-		httpclient.print(actionSound);
+		httpclient.print(actionSound[pin]);
 	}
 
 	if(state == 0)
 	{
-		httpclient.print(actionNoSound);
+		httpclient.print(actionNoSound[pin]);
 	}
 
-	if(state == -1)
-	{
-		httpclient.print(actionStartup);
-	}
 
 	// flush, so the buffer is clear to read response:
 	httpclient.flush();
