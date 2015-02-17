@@ -21,7 +21,7 @@ const int ledPin = D0;
 const int ledPin2 = D1;
 const int soundPins[] = {A0, A1, A2, A3, A4, A5, A6, A7};
 
-static const int pinCount = 8;
+const int pinCount = 8;
 int soundValues[pinCount] = {0};
 
 int threshold = 2200; //in mV
@@ -40,7 +40,7 @@ uint8_t responseBuffer[1024];
 char actionSound[pinCount][230];
 char actionNoSound[pinCount][231];
 
-bool debug = true;
+bool debug = false;
 
 /* This function is called once at start up ----------------------------------*/
 void setup()
@@ -48,9 +48,9 @@ void setup()
 	pinMode(ledPin, OUTPUT);
 	pinMode(ledPin2, OUTPUT);
 
-	// register every pin as input:
 	for (int pin = 0; pin < pinCount; ++pin)
 	{
+		// register every pin as input:
 		pinMode(soundPins[pin], INPUT);
 
 		// create http post strings:
@@ -125,32 +125,32 @@ void updateState(int pin, int state)
 
 
 void postState(int pin, int state) {
-	if(debug) Serial.println("Sending state over HTTP POST");
-	if(debug) Serial.print("Pin: ");
+	if(debug) Serial.println("> Sending state over HTTP POST");
+	if(debug) Serial.print("> pin: ");
 	if(debug) Serial.print(pin);
-	if(debug) Serial.print("State: ");
+	if(debug) Serial.print(" | state: ");
 	if(debug) Serial.println(state);
 
 
 	if( !httpclient.connected() )
 	{
-		if(debug) Serial.println("HTTP was not connected. Connecting...");
+		if(debug) Serial.println("> HTTP was not connected. Connecting...");
 		httpclient.connect(httpServer, httpPort);
 	}
 
 	if( !httpclient.connected() )
 	{
-		if(debug) Serial.println("HTTP still not connected. Trying a second time...");
+		if(debug) Serial.println("> HTTP still not connected. Trying a second time...");
 		httpclient.connect(httpServer, httpPort);
 	}
 
 	if( !httpclient.connected() )
 	{
-		if(debug) Serial.println("HTTP could not connect.");
+		if(debug) Serial.println("> HTTP could not connect.");
 		return;
 	}
 
-	if(debug) Serial.println("HTTP connected. Sending state.");
+	if(debug) Serial.println("> HTTP connected. Sending state.");
 
 
 	if(state == 1)
@@ -167,7 +167,7 @@ void postState(int pin, int state) {
 	// flush, so the buffer is clear to read response:
 	httpclient.flush();
 
-	if(debug) Serial.println("> HTTP request sent:");
+	if(debug) Serial.println("> HTTP request sent.");
 
 	// httpclient.stop(); //break connection (not necessary, server will break connection depending on 'Connection' header)
 }
